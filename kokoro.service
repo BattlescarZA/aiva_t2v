@@ -1,0 +1,18 @@
+[Unit]
+Description=Kokoro Text-to-Speech Service
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/kokoro
+ExecStartPre=/bin/mkdir -p /var/www/.config/pulse
+ExecStartPre=/bin/chown -R www-data:www-data /var/www/.config
+ExecStart=/bin/su -s /bin/bash -c "/usr/bin/python3 /opt/kokoro/service.py --port 18222 >> /var/log/kokoro.log 2>&1" www-data
+Restart=on-failure
+RestartSec=5s
+Environment=PYTHONUNBUFFERED=1
+Environment=TRANSFORMERS_CACHE=/opt/kokoro/.cache
+StandardOutput=append:/var/log/kokoro.log
+StandardError=append:/var/log/kokoro.log
+
+[Install]
+WantedBy=multi-user.target
